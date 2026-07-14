@@ -12,7 +12,12 @@ jobs:
       - name: Check site availability
         run: |
           URL="https://222.ct.ws/"
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL")
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
+            -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
+            -H "Accept-Language: en-US,en;q=0.9" \
+            -L \
+            "$URL")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           
           if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
