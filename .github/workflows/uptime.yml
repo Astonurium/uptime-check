@@ -1,0 +1,23 @@
+name: Uptime Check
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check site availability
+        run: |
+          URL="https://222.ct.ws/"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 "$URL")
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "✅ [$TIMESTAMP] $URL is UP (HTTP $STATUS)"
+          else
+            echo "❌ [$TIMESTAMP] $URL is DOWN or unreachable (HTTP $STATUS)"
+            exit 1
+          fi
