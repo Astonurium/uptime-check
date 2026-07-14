@@ -1,32 +1,28 @@
+name: Uptime Check
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
       - name: Check site availability
-        id: check
         run: |
           URL="https://222.ct.ws/"
-          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          
-          echo "🔍 Checking $URL at $TIMESTAMP"
-          
-          # Более «человеческий» запрос
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --max-time 30 \
-            --retry 2 \
-            --retry-delay 5 \
-            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36" \
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" \
             -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" \
-            -H "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8" \
-            -H "Accept-Encoding: gzip, deflate" \
-            -H "Connection: keep-alive" \
+            -H "Accept-Language: en-US,en;q=0.9" \
             -L \
-            --compressed \
             "$URL")
-          
-          echo "HTTP Status: $STATUS"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
           
           if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
             echo "✅ [$TIMESTAMP] $URL is UP (HTTP $STATUS)"
-            echo "status=up" >> $GITHUB_OUTPUT
           else
-            echo "❌ [$TIMESTAMP] $URL is DOWN or blocked (HTTP $STATUS)"
-            echo "status=down" >> $GITHUB_OUTPUT
+            echo "❌ [$TIMESTAMP] $URL is DOWN or unreachable (HTTP $STATUS)"
             exit 1
           fi
