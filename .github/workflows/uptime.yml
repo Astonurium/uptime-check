@@ -1,14 +1,19 @@
 name: Uptime Check
-
 on:
   schedule:
     - cron: '0 6 * * *'
+    - cron: '0 18 * * *'
   workflow_dispatch:
-
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - name: Random delay
+        run: |
+          DELAY=$(( RANDOM % 3600 ))  # случайная задержка 0-59 минут
+          echo "Sleeping for $DELAY seconds"
+          sleep "$DELAY"
+
       - name: Check site availability
         run: |
           URL="https://222.ct.ws/"
@@ -19,7 +24,7 @@ jobs:
             -L \
             "$URL")
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          
+
           if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
             echo "✅ [$TIMESTAMP] $URL is UP (HTTP $STATUS)"
           else
